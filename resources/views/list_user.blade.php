@@ -1,63 +1,73 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mt-5 position-relative">
+<div class="container mt-4">
 
-    {{-- Page Header --}}
-    <div class="text-center mb-5">
-        <h1 class="fw-bold text-primary display-5">Daftar User</h1>
-        <p class="text-secondary fs-6">Berikut adalah daftar user yang sudah terdaftar di sistem</p>
-    </div>
-
-    {{-- User Table Card --}}
-    <div class="card shadow-sm rounded-4 border-0">
-        <div class="card-header p-3" style="background: linear-gradient(90deg, #74b9ff, #0984e3);">
-            <h5 class="mb-0 text-white fw-semibold">Tabel Data User</h5>
+    {{-- Notifikasi sukses/error --}}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <div class="card-body p-0">
-            <table class="table align-middle mb-0">
-                <thead class="text-white" style="background: linear-gradient(90deg, #0984e3, #74b9ff);">
+    @elseif (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-users"></i> Daftar Mahasiswa</h4>
+            <a href="{{ route('user.create') }}" class="btn btn-light btn-sm">
+                <i class="fas fa-plus-circle"></i> Tambah Mahasiswa
+            </a>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <th scope="col" class="text-center py-3">ID</th>
-                        <th scope="col" class="py-3">Nama</th>
-                        <th scope="col" class="text-center py-3">NIM</th>
-                        <th scope="col" class="text-center py-3">Kelas</th>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>NIM</th>
+                        <th>Kelas</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($users as $user)
-                        <tr class="border-bottom hover-shadow" style="transition: background-color .3s;">
-                            <td class="text-center py-3 fw-semibold">{{ $user->id }}</td>
-                            <td class="py-3">{{ $user->nama }}</td>
-                            <td class="text-center py-3">{{ $user->nim }}</td>
-                            <td class="text-center py-3">
-                                <span class="badge rounded-pill bg-gradient"
-                                      style="background: #2d98da; cursor: default; transition: background-color 0.3s;"
-                                      onmouseover="this.style.background='#0a74da';"
-                                      onmouseout="this.style.background='#2d98da';">
-                                    {{-- tampil sesuai input database --}}
-                                    {{ $user->kelas }}
-                                </span>
+                        <tr>
+                            <td>{{ $user->id }}</td>
+                            <td>{{ $user->nama }}</td>
+                            <td>{{ $user->nim }}</td>
+                            <td>{{ $user->kelas->nama_kelas ?? '-' }}</td>
+                            <td>
+                                {{-- Tombol Edit --}}
+                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-warning me-2">
+                                <i class="fas fa-edit"></i> Edit
+                                </a>
+
+
+                                {{-- Tombol Hapus --}}
+                                <form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <i class="fas fa-trash-alt"></i> Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-5 fst-italic">Belum ada data user</td>
+                            <td colspan="5" class="text-muted">Belum ada data mahasiswa.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-
-    {{-- Floating Add User Button --}}
-    <a href="{{ url('/create') }}"
-       class="btn btn-primary btn-lg rounded-circle shadow-lg position-fixed"
-       style="bottom: 30px; right: 30px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;"
-       title="Tambah User"
-       aria-label="Tambah User">
-        <i class="bi bi-person-plus-fill fs-3"></i>
-    </a>
-
 </div>
 @endsection
