@@ -45,5 +45,42 @@ public function index()
     ];
     return view('list_user', $data);
 }
+
+public function edit($id)
+{
+    $user = UserModel::findOrFail($id);
+    $kelas = Kelas::all();
+    
+    return view('edit_user', [
+        'title' => 'Edit Data Mahasiswa',
+        'user' => $user,
+        'kelas' => $kelas,
+    ]);
+}
+
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'nim' => 'required|string|max:20',
+        'kelas_id' => 'required',
+    ]);
+
+    $user = UserModel::findOrFail($id);
+    $user->update($request->all());
+
+    return redirect()->route('user.index')->with('success', 'Data mahasiswa berhasil diperbarui!');
+}
+
+
+public function destroy($id)
+{
+    $user = UserModel::findOrFail($id);
+    $user->delete();
+
+    return redirect()->to('/user')->with('success', 'Data berhasil dihapus!');
+}
+
    
 }
